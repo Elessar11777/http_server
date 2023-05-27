@@ -75,6 +75,7 @@ def answer(data, b_image, p_image, b_link, p_link):
 @app.route('/upload/', methods=['POST'])
 def upload():
     data = flask.request.get_json()
+    print(data)
     if not data:
         return "No JSON data provided", 400
     else:
