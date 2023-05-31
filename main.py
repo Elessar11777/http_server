@@ -89,7 +89,7 @@ def upload():
         except:
             pass
 
-        for light, values in data["Source"].items():
+        for light, values in data["Transport_Source"].items():
             for exposure, b64_image in values.items():
                 data["R_Hash"]["Source"][light].setdefault(exposure, None)
                 data["Source"][light][exposure], r_hash = b64_to_cv2(b64_image)
