@@ -48,7 +48,7 @@ def acquired_saver(data, root="./"):
     except Exception as e:
         print(e)
 
-    for light, values in data["Source"].items():
+    for light, values in data["Transport_Source"].items():
         for exposure, image in values.items():
             save_path = os.path.join(source_dir_path, light, f"{data['Meta']['Time']}_{light}_{exposure}.png")
             cv2.imwrite(save_path, image)
