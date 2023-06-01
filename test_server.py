@@ -29,6 +29,7 @@ def b64_to_cv2(base64_string):
 
 
 def acquired_saver(data, root="./"):
+    print("try cr dirs")
     time_dir_path = os.path.join(root, f"{data['Meta']['Date']}", f"{data['Meta']['Time']}")
     images_dir_path = os.path.join(time_dir_path, "Images")
     source_dir_path = os.path.join(time_dir_path, "Source")
@@ -42,9 +43,13 @@ def acquired_saver(data, root="./"):
     link_b = os.path.join(images_dir_path, f"{data['Meta']['Time']}_B.png")
     link_p = os.path.join(images_dir_path, f"{data['Meta']['Time']}_P.png")
     link_mask = os.path.join(images_dir_path, f"{data['Meta']['Time']}_Mask.png")
-
+    print("try wr 1")
+    print(link_b)
     cv2.imwrite(link_b, data["Images"]["B"])
+    print("try wr 2")
+    print(link_p)
     cv2.imwrite(link_p, data["Images"]["P"])
+    print("try wr 3")
     try:
         cv2.imwrite(link_mask, data["Images"]["Mask"])
     except Exception as e:
@@ -124,6 +129,7 @@ def upload():
             string_image_p = None
 
         if data["Hash"] == data["R_Hash"]:
+            print("Ok hash")
             link_b, link_p, link_mask = acquired_saver(data, root=data["Root"])
 
             answ = answer(data, link_b, link_p)
