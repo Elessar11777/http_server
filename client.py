@@ -7,9 +7,11 @@ import re
 import hashlib
 import os
 import sys
-from logger import aeya_logger
+import logging
 import io
 from PIL import Image
+
+aeya_logger = logging.Logger(__name__)
 
 class HTTPRequester:
     def __init__(self, url="http://194.186.150.221", data_port="1515", production_port="1516", ml_port="1517",

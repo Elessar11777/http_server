@@ -5,13 +5,9 @@ import numpy
 import cv2
 import base64
 import hashlib
-from PIL import Image
-import json
-
 
 # Creating GMIC interpreter object
 gmic_interpreter = gmic.Gmic()
-
 app = flask.Flask(__name__)
 
 
@@ -21,7 +17,6 @@ def b64_to_cv2(base64_string):
         hash_object = hashlib.sha256(decoded_data)
         r_hash = hash_object.hexdigest()
         img_arr = numpy.frombuffer(decoded_data , dtype=numpy.uint8)
-        # buf = numpy.frombuffer(decoded_data, dtype=numpy.uint8)
         cv2_img = cv2.imdecode(img_arr, cv2.IMREAD_COLOR)
         return cv2_img, r_hash
     except Exception as e:
