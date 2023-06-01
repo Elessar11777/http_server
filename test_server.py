@@ -97,11 +97,9 @@ def upload():
             # gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["P"]))
             gmic_image_B = gmic.GmicImage.from_numpy(data["Images"]["B"])
             gmic_image_P = gmic.GmicImage.from_numpy(data["Images"]["P"])
-            try:
-                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_B)
-                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_P)
-            except gmic.GmicException as e:
-                print(f"Gmic exception: {e}")
+
+            gmic.run(f"{data['Gmic']}", gmic_image_B)
+            gmic.run(f"{data['Gmic']}", gmic_image_P)
             data["Images"]["B"] = gmic_image_B.to_numpy()
             data["Images"]["P"] = gmic_image_P.to_numpy()
             data["Images"]["B"] = numpy.squeeze(data["Images"]["B"], axis=2)
