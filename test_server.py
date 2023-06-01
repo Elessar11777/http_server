@@ -9,8 +9,8 @@ import contextlib
 import io
 
 # Creating GMIC interpreter object
-gmic_interpreter = gmic.Gmic()
-app = flask.Flask(__name__)
+gmic_interpreter = gmic.Gmic(silent=True)
+AY = Noneapp = flask.Flask(__name__)
 
 
 def b64_to_cv2(base64_string):
