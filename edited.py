@@ -5,7 +5,7 @@ import numpy
 import cv2
 import base64
 import hashlib
-
+from PIL import Image
 
 # Creating GMIC interpreter object
 gmic_interpreter = gmic.Gmic()
@@ -19,12 +19,13 @@ def b64_to_cv2(base64_string):
 
         hash_object = hashlib.sha256(decoded_data)
         r_hash = hash_object.hexdigest()
-
-        buf = numpy.frombuffer(decoded_data, dtype=numpy.uint8)
+        buf = numpy.array(Image.open(decoded_data))
+        # buf = numpy.frombuffer(decoded_data, dtype=numpy.uint8)
         cv2_img = cv2.imdecode(buf, cv2.IMREAD_COLOR)
         return cv2_img, r_hash
     except Exception as e:
         print(e)
+
 
 def acquired_saver(data, root="./"):
     time_dir_path = os.path.join(root, f"{data['Meta']['Date']}", f"{data['Meta']['Time']}")
@@ -55,8 +56,8 @@ def acquired_saver(data, root="./"):
 
     return link_b, link_p, link_mask
 
+
 def answer(data, b_image, p_image, b_link, p_link):
-    print(data)
     answer_dict = {
         "Images": {
             "B": b_image,
@@ -69,16 +70,16 @@ def answer(data, b_image, p_image, b_link, p_link):
         },
         "Lost_Hashes": []
     }
-    print(type(answer_dict))
     return answer_dict
+
 
 @app.route('/upload/', methods=['POST'])
 def upload():
     data = flask.request.get_json()
-    print(data)
     if not data:
         return "No JSON data provided", 400
     else:
+        print(len(data["Images"]['B']))
         data["Images"]["B"], r_hash = b64_to_cv2(data["Images"]["B"])
         data["R_Hash"]["Images"]["B"] = r_hash
         data["Images"]["P"], r_hash = b64_to_cv2(data["Images"]["P"])
@@ -92,7 +93,7 @@ def upload():
         for light, values in data["Transport_Source"].items():
             for exposure, b64_image in values.items():
                 data["R_Hash"]["Source"][light].setdefault(exposure, None)
-                data["Source"][light][exposure], r_hash = b64_to_cv2(b64_image)
+                data["Transport_Source"][light][exposure], r_hash = b64_to_cv2(b64_image)
                 data["R_Hash"]["Source"][light][exposure] = r_hash
 
         if data["Meta"]["Research"] == "gracia":
@@ -130,7 +131,5 @@ def upload():
             return flask.jsonify(answer(data)), 400
 
 
-
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1515, debug=True)
+    app.run(host='0.0.0.0', port=1515, debug=False)
