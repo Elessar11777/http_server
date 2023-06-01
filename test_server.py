@@ -55,12 +55,8 @@ def acquired_saver(data, root="./"):
     return link_b, link_p, link_mask
 
 
-def answer(data, b_image, p_image, b_link, p_link):
+def answer(data, b_link, p_link):
     answer_dict = {
-        "Images": {
-            "B": b_image,
-            "P": p_image
-        },
         "Links": {
             "B": b_link,
             "P": p_link,
@@ -96,33 +92,32 @@ def upload():
                 data["R_Hash"]["Source"][light][exposure] = r_hash
 
         if data["Meta"]["Research"] == "gracia":
-            gmic_image_list = []
-            gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["B"]))
-            gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["P"]))
+            # gmic_image_list = []
+            # gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["B"]))
+            # gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["P"]))
+            gmic_image_B = gmic.GmicImage.from_numpy(data["Images"]["B"])
+            gmic_image_P = gmic.GmicImage.from_numpy(data["Images"]["P"])
             try:
-                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_list)
+                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_B)
+                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_P)
             except gmic.GmicException as e:
                 print(f"Gmic exception: {e}")
-            data["Images"]["B"] = gmic_image_list[0].to_numpy()
-            data["Images"]["P"] = gmic_image_list[1].to_numpy()
+            data["Images"]["B"] = gmic_image_B.to_numpy()
+            data["Images"]["P"] = gmic_image_P.to_numpy()
             data["Images"]["B"] = numpy.squeeze(data["Images"]["B"], axis=2)
             data["Images"]["P"] = numpy.squeeze(data["Images"]["P"], axis=2)
 
-            try:
-                gmic_interpreter.run(f"resize 300,300", gmic_image_list)
-            except gmic.GmicException as e:
-                print(f"Gmic exception: {e}")
-            resized_b_numpy = gmic_image_list[0].to_numpy()
-            resized_b_numpy_sqieezed = numpy.squeeze(resized_b_numpy)
-            byte_image = resized_b_numpy_sqieezed.tobytes()
-            b64_image = base64.b64encode(byte_image)
-            string_image_b = b64_image.decode('utf-8')
-
-            resized_p_numpy = gmic_image_list[1].to_numpy()
-            resized_p_numpy_sqieezed = numpy.squeeze(resized_p_numpy)
-            byte_image = resized_p_numpy_sqieezed.tobytes()
-            b64_image = base64.b64encode(byte_image)
-            string_image_p = b64_image.decode('utf-8')
+            # resized_b_numpy = gmic_image_list[0].to_numpy()
+            # resized_b_numpy_sqieezed = numpy.squeeze(resized_b_numpy)
+            # byte_image = resized_b_numpy_sqieezed.tobytes()
+            # b64_image = base64.b64encode(byte_image)
+            # string_image_b = b64_image.decode('utf-8')
+            #
+            # resized_p_numpy = gmic_image_list[1].to_numpy()
+            # resized_p_numpy_sqieezed = numpy.squeeze(resized_p_numpy)
+            # byte_image = resized_p_numpy_sqieezed.tobytes()
+            # b64_image = base64.b64encode(byte_image)
+            # string_image_p = b64_image.decode('utf-8')
         else:
             string_image_b = None
             string_image_p = None
@@ -130,7 +125,7 @@ def upload():
         if data["Hash"] == data["R_Hash"]:
             link_b, link_p, link_mask = acquired_saver(data, root=data["Root"])
 
-            answ = answer(data, string_image_b, string_image_p, link_b, link_p)
+            answ = answer(data, link_b, link_p)
             return flask.jsonify(answ), 200
         else:
             return flask.jsonify(answer(data)), 400
