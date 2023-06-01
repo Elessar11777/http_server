@@ -5,6 +5,8 @@ import numpy
 import cv2
 import base64
 import hashlib
+import contextlib
+import io
 
 # Creating GMIC interpreter object
 gmic_interpreter = gmic.Gmic()
@@ -97,13 +99,19 @@ def upload():
             gmic_image_list = []
             gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["B"]))
             gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["P"]))
-            gmic_interpreter.run(f"{data['Gmic']}", gmic_image_list)
+            f = io.StringIO()
+            with contextlib.redirect_stderr(f):
+                with contextlib.redirect_stdout(f):
+                    gmic_interpreter.run(f"{data['Gmic']}", gmic_image_list)
             data["Images"]["B"] = gmic_image_list[0].to_numpy()
             data["Images"]["P"] = gmic_image_list[1].to_numpy()
             data["Images"]["B"] = numpy.squeeze(data["Images"]["B"], axis=2)
             data["Images"]["P"] = numpy.squeeze(data["Images"]["P"], axis=2)
 
-            gmic_interpreter.run(f"resize 300,300", gmic_image_list)
+            f = io.StringIO()
+            with contextlib.redirect_stderr(f):
+                with contextlib.redirect_stdout(f):
+                    gmic_interpreter.run(f"resize 300,300", gmic_image_list)
             resized_b_numpy = gmic_image_list[0].to_numpy()
             resized_b_numpy_sqieezed = numpy.squeeze(resized_b_numpy)
             byte_image = resized_b_numpy_sqieezed.tobytes()
