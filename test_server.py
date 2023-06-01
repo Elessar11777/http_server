@@ -9,7 +9,7 @@ import contextlib
 import io
 
 # Creating GMIC interpreter object
-gmic_interpreter = gmic.Gmic(silent=True)
+gmic_interpreter = gmic.Gmic()
 app = flask.Flask(__name__)
 
 
@@ -99,19 +99,19 @@ def upload():
             gmic_image_list = []
             gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["B"]))
             gmic_image_list.append(gmic.GmicImage.from_numpy(data["Images"]["P"]))
-            f = io.StringIO()
-            with contextlib.redirect_stderr(f):
-                with contextlib.redirect_stdout(f):
-                    gmic_interpreter.run(f"{data['Gmic']}", gmic_image_list)
+            try:
+                gmic_interpreter.run(f"{data['Gmic']}", gmic_image_list)
+            except gmic.GmicException as e:
+                print(f"Gmic exception: {e}")
             data["Images"]["B"] = gmic_image_list[0].to_numpy()
             data["Images"]["P"] = gmic_image_list[1].to_numpy()
             data["Images"]["B"] = numpy.squeeze(data["Images"]["B"], axis=2)
             data["Images"]["P"] = numpy.squeeze(data["Images"]["P"], axis=2)
 
-            f = io.StringIO()
-            with contextlib.redirect_stderr(f):
-                with contextlib.redirect_stdout(f):
-                    gmic_interpreter.run(f"resize 300,300", gmic_image_list)
+            try:
+                gmic_interpreter.run(f"resize 300,300", gmic_image_list)
+            except gmic.GmicException as e:
+                print(f"Gmic exception: {e}")
             resized_b_numpy = gmic_image_list[0].to_numpy()
             resized_b_numpy_sqieezed = numpy.squeeze(resized_b_numpy)
             byte_image = resized_b_numpy_sqieezed.tobytes()
