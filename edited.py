@@ -10,7 +10,7 @@ import json
 
 
 # Creating GMIC interpreter object
-gmic_interpreter = gmic.Gmic()
+gmic_interpreter = gmic.Gmic(silent=True)
 
 app = flask.Flask(__name__)
 
