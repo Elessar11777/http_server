@@ -7,6 +7,9 @@ import base64
 import hashlib
 import contextlib
 import io
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 # Creating GMIC interpreter object
 gmic_interpreter = gmic.Gmic()
@@ -98,8 +101,8 @@ def upload():
             gmic_image_B = gmic.GmicImage.from_numpy(data["Images"]["B"])
             gmic_image_P = gmic.GmicImage.from_numpy(data["Images"]["P"])
 
-            gmic.run(f"{data['Gmic']}", gmic_image_B)
-            gmic.run(f"{data['Gmic']}", gmic_image_P)
+            gmic_interpreter.run(f"{data['Gmic']}", gmic_image_B)
+            gmic_interpreter.run(f"{data['Gmic']}", gmic_image_P)
             data["Images"]["B"] = gmic_image_B.to_numpy()
             data["Images"]["P"] = gmic_image_P.to_numpy()
             data["Images"]["B"] = numpy.squeeze(data["Images"]["B"], axis=2)
