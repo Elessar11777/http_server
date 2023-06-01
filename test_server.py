@@ -130,6 +130,7 @@ def upload():
 
         if data["Hash"] == data["R_Hash"]:
             print("Ok hash")
+            print(data["Root"])
             link_b, link_p, link_mask = acquired_saver(data, root=data["Root"])
 
             answ = answer(data, link_b, link_p)
